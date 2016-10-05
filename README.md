@@ -1,1 +1,1 @@
-# PlaneSpotters
+# PlaneSpotters - Demonstrating the use of Django, Eclipse plugin, DITA publishing

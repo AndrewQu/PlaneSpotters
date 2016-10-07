@@ -1,0 +1,16 @@
+<html>
+<head><title>Error in Adding New Sighting</title></head>
+
+<body>
+<br />
+<p>
+{% if errmsg %}
+  {{ errmsg }}
+{% else %}
+   Cannot save sighting - missing data.
+{% endif %}
+</p>
+<br />
+<a href='add/'>Set Sighting Data</a>
+</body>
+</html>

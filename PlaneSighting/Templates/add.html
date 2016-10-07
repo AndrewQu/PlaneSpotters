@@ -1,0 +1,32 @@
+<html>
+<head><title>Add a New Sighting</title>
+   <style>
+      .lalign { text-align:left; }
+      .ralign { text-align:right; }
+   </style>
+   <script src="{{ STATIC_URL }}jquery-1.11.1.min.js" type="text/javascript"></script>
+   <script src="{{ STATIC_URL }}sighting.js" type="text/javascript"></script>
+</head>
+
+<body style='font-family:verdana;' onload="sightingPageLoaded()">
+
+<table style="margin-left:auto; margin-right:auto;" >
+<tr><th>New Plane Sighting</th></tr>
+
+<tr><td><table>
+   <tr><th colspan='2' class='lalign'>Spotter Details</th></tr>
+   <tr><td>Spotter ID</td><td><select id='spotterId' onchange="spotterIdChanged();">
+      <option value='0'>New</option>
+      {% for spotter in spotters %}
+         <option value='{{spotter.spotter_id}}'>{{ spotter.spotter_id }} - {{ spotter.name }}</option>
+      {% endfor %}
+      </select>
+   </td></tr>
+   <tr><td class='ralign'>Name</td><td> <input id='spotterName' type='text' /></td> </tr>
+   <tr><td class='ralign'>E-Mail</td><td> <input id='spotterEmail' type='text' /></td> </tr>
+</table></td></tr>
+
+</table>
+
+</body>
+</html>

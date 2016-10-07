@@ -30,6 +30,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="manage.py" />
+    <Compile Include="PlaneSighting\admin.py" />
+    <Compile Include="PlaneSighting\models.py" />
+    <Compile Include="PlaneSighting\tests.py" />
+    <Compile Include="PlaneSighting\urls.py" />
+    <Compile Include="PlaneSighting\views.py" />
+    <Compile Include="PlaneSighting\__init__.py" />
     <Compile Include="PlaneSpotters\__init__.py" />
     <Compile Include="PlaneSpotters\settings.py" />
     <Compile Include="PlaneSpotters\urls.py" />
@@ -43,7 +49,19 @@
     </WebPiReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="static\" />
+    <Folder Include="PlaneSighting\" />
+    <Folder Include="PlaneSighting\static\" />
+    <Folder Include="PlaneSighting\Templates\" />
     <Folder Include="PlaneSpotters\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PlaneSighting\static\aircraft.cat" />
+    <Content Include="PlaneSighting\static\engine.cat" />
+    <Content Include="PlaneSighting\static\sighting.js" />
+    <Content Include="PlaneSighting\Templates\add.html" />
+    <Content Include="PlaneSighting\Templates\adderr.html" />
+    <Content Include="static\jquery-1.11.1.min.js" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Python Tools\Microsoft.PythonTools.Django.targets" />
   <ProjectExtensions>

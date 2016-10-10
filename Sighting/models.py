@@ -1,3 +1,8 @@
+﻿from __future__ import unicode_literals
+
+from django.db import models
+
+# Create your models here.
 from django.db import models
 import os.path
 
@@ -36,7 +41,7 @@ class Aircraft(models.Model) :
    type = models.CharField(max_length=25, choices=GetTypeChoice('aircraft'), default="unknown")
    engine = models.ForeignKey('Engine', on_delete=models.PROTECT, default=1)
    size = models.ForeignKey('Size', on_delete=models.PROTECT)
-   wings = models.ForeignKey('Wings', on_delete=models.PROTECT)
+   wing = models.ForeignKey('Wing', on_delete=models.PROTECT)
 
 class Engine(models.Model) :
    ENGINE_POSITION = (
@@ -73,13 +78,16 @@ class Size(models.Model) :
       return "Length: " + self.length + " Wing span: " + self.wingspan + " Tail height: " + self.tailheight
 
 
-class Wings(models.Model) :
+class Wing(models.Model) :
    number = models.IntegerField("Number of wings", default=2)
    position = models.CharField("Fuselage position", max_length=3, choices=(('A', 'Above'), ('B', 'Below'), ('M','Fixed at mid-point')))
    swept = models.IntegerField("Swept Rearwards (degrees)", default=10)
 
    def NumberOfWings() :
       return number
+
+   def __unicode__(self):
+      return "Wing # " + str(self.number) + " Fuselage pos:" + self.position + " Swept:" + str(self.swept)
 
 class Spotter(models.Model) :
    spotter_id = models.AutoField(primary_key=True)
@@ -96,4 +104,4 @@ class Location(models.Model) :
    longitude = models.FloatField(default=0)
 
    def __unicode__(self):
-      return name + "(lat:" + self.latitude + ", long:" + self.longitude + ")"
+      return self.name + "(lat:" + str(self.latitude) + ", long:" + str(self.longitude) + ")"

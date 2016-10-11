@@ -47,3 +47,19 @@ function locationIdChanged() {
       });
    }
 }
+
+function uploadAudio() {
+   var fd = new FormData(document.getElementById("audioform"));
+   fd.append("label", "WEBUPLOAD");
+   $.ajax({
+      url: "uploadfile/",
+      type: "POST",
+      data: fd,
+      processData: false,  // tell jQuery not to process the data
+      contentType: false   // tell jQuery not to set contentType
+   }).done(function (json) {
+      if (json.path) $('#audioPath').html(json.path);
+      else alert("Expecting json.path");
+   });
+   return false;
+}

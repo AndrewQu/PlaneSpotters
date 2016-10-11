@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
+from datetime import datetime
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 from Sighting.models import Sighting
 from Sighting.models import Aircraft
@@ -24,6 +27,7 @@ def add(request) :
                'sizeChoice' : Size.LENGTH_CHOICE,
                'engineTypes' : GetTypeChoice('engine'),
                'enginePos' : Engine.ENGINE_POSITION,
+               'aircraftTypes': GetTypeChoice('aircraft'),
              }
    return render(request, 'add.html', context)
 
@@ -34,6 +38,18 @@ def save_sighting(request) :
         'errmsg': errmsg,
     })
    return HttpResponse(template.render(context))
+
+def uploadfile(request) :
+    # request to display the upload file page
+    if request.method != 'POST' :
+       return JsonResponse({'err':'Invalid file uplaod request!'})
+    else :
+       # Upload (post) a selected file
+       files = request.FILES.getlist('audio_file')
+       fpath = datetime.now().strftime("%Y_%m_%d-%H_%M_%S") + ".wav"
+       fs = FileSystemStorage()
+       filename = fs.save(fpath, files[0])
+       return JsonResponse({'path': fpath}) # + " name=" + filename + "  url=" + fs.url(filename)})
 
 def service(request) :
    cmd = request.GET.get("cmd", "")
@@ -51,6 +67,5 @@ def service(request) :
          return JsonResponse({'name': locations[0].name, 'lat': locations[0].latitude,
                              'long': locations[0].longitude })
       else : return JsonResponse({'err': 'Invalid spotter id: ' + str(sid) })
-
 
    return JsonResponse({'err':'sid=' + str(sid) + "  cmd=" + cmd })

@@ -130,3 +130,6 @@ STATICFILES_DIRS = (
     "C:/Users/djwwwroot/PlaneSpotters/static/",
     "C:/Users/djwwwroot/PlaneSpotters/Sighting/static/",
 )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

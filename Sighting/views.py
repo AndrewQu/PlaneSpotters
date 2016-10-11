@@ -11,6 +11,7 @@ from Sighting.models import Size
 from Sighting.models import Wing
 from Sighting.models import Spotter
 from Sighting.models import Location
+from Sighting.models import GetTypeChoice
  
 def index(request) :
    return HttpResponse("Welcome to Plane Spotters Home: " + request.path + " !")
@@ -19,6 +20,10 @@ def index(request) :
 def add(request) :
    context = { 'spotters': Spotter.objects.all(),
                'locations' : Location.objects.all(),
+               'engLocChoice' : Wing.LocationChoice,
+               'sizeChoice' : Size.LENGTH_CHOICE,
+               'engineTypes' : GetTypeChoice('engine'),
+               'enginePos' : Engine.ENGINE_POSITION,
              }
    return render(request, 'add.html', context)
 

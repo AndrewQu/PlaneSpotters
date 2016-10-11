@@ -46,6 +46,9 @@ class Aircraft(models.Model) :
 class Engine(models.Model) :
    ENGINE_POSITION = (
       ('12', 'left-right'),
+      ('1L', 'left'),
+      ('1R', 'right'),
+      ('1C', 'center'),
       ('123', 'left-cen-right'),
       ('1234', 'left-left-right-right'),
       ('123456','left-left-cen-cen-right-right'),
@@ -59,16 +62,20 @@ class Engine(models.Model) :
 
 class Size(models.Model) :
    LENGTH_CHOICE = (
-      ('1', '10-20m'),
-      ('2', '20-30m'),
-      ('3', '30-40m'),
-      ('4', '40-50m'),
-      ('5', '50-60m'),
-      ('6', '60-70m'),
-      ('7', '70-80m'),
-      ('8', '80-90m'),
-      ('9', '90-100m'),
-      ('10', '> 100m')
+      ('1', '1-3m'),
+      ('3', '3-5m'),
+      ('5', '5-7m'),
+      ('7', '7-10m'),
+      ('10', '10-20m'),
+      ('20', '20-30m'),
+      ('30', '30-40m'),
+      ('40', '40-50m'),
+      ('50', '50-60m'),
+      ('60', '60-70m'),
+      ('70', '70-80m'),
+      ('80', '80-90m'),
+      ('90', '90-100m'),
+      ('99', '> 100m')
    )
    length = models.CharField('Length', max_length=3, choices=LENGTH_CHOICE)
    wingspan = models.CharField('Wing Span', max_length=3, choices=LENGTH_CHOICE)
@@ -79,15 +86,16 @@ class Size(models.Model) :
 
 
 class Wing(models.Model) :
+   LocationChoice = (('A', 'Above'), ('B', 'Below'), ('M','Fixed at mid-point'))
    number = models.IntegerField("Number of wings", default=2)
-   position = models.CharField("Fuselage position", max_length=3, choices=(('A', 'Above'), ('B', 'Below'), ('M','Fixed at mid-point')))
+   position = models.CharField("Fuselage position", max_length=3, choices=LocationChoice)
    swept = models.IntegerField("Swept Rearwards (degrees)", default=10)
 
    def NumberOfWings() :
       return number
 
    def __unicode__(self):
-      return "Wing # " + str(self.number) + " Fuselage pos:" + self.position + " Swept:" + str(self.swept)
+      return "Wing # " + str(self.number) + " Engine pos:" + self.position + " Swept:" + str(self.swept)
 
 class Spotter(models.Model) :
    spotter_id = models.AutoField(primary_key=True)

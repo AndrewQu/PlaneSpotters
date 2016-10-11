@@ -1,8 +1,9 @@
 <html>
 {% load static %}
 <head><title>Add a New Sighting</title>
-   <style>
+   <style type="text/css">
       .lalign { text-align:left; }
+      .lalign_th { text-align:left; color:Blue; }
       .ralign { text-align:right; }
    </style>
    <script src="{% static "jquery-1.11.1.min.js" %}" type="text/javascript"></script>
@@ -13,9 +14,10 @@
 
 <table style="margin-left:auto; margin-right:auto;" >
 <tr><th>New Plane Sighting</th></tr>
-
+<!- Template input: spotters, locations, engLocChoice, sizeChoice, engineTypes
+  enginePos,  ->
 <tr><td><table>
-   <tr><th colspan='2' class='lalign'>Spotter Details</th></tr>
+   <tr><th colspan='2' class='lalign_th'>Spotter Details</th></tr>
    <tr><td>Spotter ID</td><td><select id='spotterId' onchange="spotterIdChanged();">
       <option value='0'>New</option>
       {% for spotter in spotters %}
@@ -27,7 +29,7 @@
    <tr><td class='ralign'>E-Mail</td><td> <input id='spotterEmail' type='text' /></td> </tr>
 </table></td></tr>
 <tr><td><table>
-   <tr><th colspan='2' class='lalign'>Location of Sighting</th></tr>
+   <tr><th colspan='2' class='lalign_th'>Location of Sighting</th></tr>
    <tr><td>Location ID</td><td><select id='locationId' onchange="locationIdChanged();">
       <option value='0'>New</option>
       {% for loc in locations %}
@@ -38,6 +40,68 @@
    <tr><td class='ralign'>Name</td><td> <input id='locName' type='text' /></td> </tr>
    <tr><td class='ralign'>Latitude</td><td> <input id='locLat' type='text' /></td> </tr>
    <tr><td class='ralign'>Longitude</td><td> <input id='locLong' type='text' /></td> </tr>
+</table></td></tr>
+<tr><td><table>
+   <tr><th colspan='2' class='lalign_th'>Wings</th></tr>
+   <tr><td class='ralign'>Number of wings</td><td> <select id='wingNumber'>
+        <option value='4'>4</option>
+        <option value='2'>2</option>
+      </select></td> </tr>
+   <tr><td class='ralign'>Engine location</td><td> <select id='wingLoc'>
+         {% for v, showname in engLocChoice %}
+            <option value='{{ v }}'>{{ showname }}</option>
+         {% endfor %}
+      </select></td> </tr>
+   <tr><td class='ralign'>Swept Rearwards(&deg;)</td><td> <input id='wingSwept' type='text' /></td> </tr>
+</table></td></tr>
+
+<tr><td><table>
+   <tr><th colspan='2' class='lalign_th'>Aircraft Size</th></tr>
+   {% with 'plength wingSpan' as ids %}
+   {% for idid in ids.split %}
+   <tr><td class='ralign'>{% cycle 'Length' 'Wing Span' %}</td><td> <select id="{{ idid }}">
+         {% for key, val in sizeChoice %}
+            {% if key|length > 1 %}
+               <option value='{{ key }}'>{{ val }}</option>
+            {% endif %}
+         {% endfor %}
+      </select></td> </tr>
+   {% endfor %}
+   {% endwith %}
+   <tr><td class='ralign'>Tail Height</td><td> <select id='tailHeight'>
+         {% for key, val in sizeChoice %}
+            {% if key|length < 2 %}
+               <option value='{{ key }}'>{{ val }}</option>
+            {% endif %}
+         {% endfor %}
+      </select></td> </tr>
+</table></td></tr>
+
+<tr><td><table>
+   <tr><th colspan='2' class='lalign_th'>Engines</th></tr>
+   <tr><td class='ralign'>Number of engines</td><td> <select id='engNumber'>
+        <option value='2'>2</option>
+        <option value='1'>1</option>
+        <option value='3'>3</option>
+        <option value='4'>4</option>
+        <option value='5'>5</option>
+      </select></td> </tr>
+   <tr><td class='ralign'>Engine type</td><td> <select id='engType'>
+         {% for k, v in engineTypes %}
+            <option value='{{ k }}'>{{ v }}</option>
+         {% endfor %}
+      </select></td> </tr>
+   <tr><td class='ralign'>Engine position</td><td> <select id='engPos'>
+         {% for k, v in enginePos %}
+            <option value='{{ k }}'>{{ v }}</option>
+         {% endfor %}
+      </select></td> </tr>
+   <tr><td class='ralign'>Noise Description</td><td></td></tr>
+   <tr><td colspan='2'><textarea id='engNoise' rows='3' cols='45'></textarea></td></tr>
+   <tr><td>Audio file</td><td id="audioPath"></td></tr>
+   <tr><td colspan='2'><form action="uploadfile" method="post" enctype="multipart/form-data">{% csrf_token %}
+       <input id="audio_file" type="file" name="audio_file" />
+       <input type="submit" value="Upload Audio File" /></form></td></tr>
 </table></td></tr>
 
 </table>

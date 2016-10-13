@@ -7,6 +7,8 @@ from datetime import datetime
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
+import os
+
 from Sighting.models import Sighting
 from Sighting.models import Aircraft
 from Sighting.models import Engine
@@ -46,10 +48,15 @@ def uploadfile(request) :
     else :
        # Upload (post) a selected file
        files = request.FILES.getlist('audio_file')
-       fpath = datetime.now().strftime("%Y_%m_%d-%H_%M_%S") + ".wav"
+       if len(files) == 0 :
+          files = request.FILES.getlist('img_file')
+       if len(files) == 0 :
+          return JsonResponse({'path':'No files uploaded'})
+       fname, fext = os.path.splitext(files[0].name)
+       fpath = datetime.now().strftime("%Y_%m_%d-%H_%M_%S") + fext
        fs = FileSystemStorage()
        filename = fs.save(fpath, files[0])
-       return JsonResponse({'path': fpath}) # + " name=" + filename + "  url=" + fs.url(filename)})
+       return JsonResponse({'path': fpath})
 
 def service(request) :
    cmd = request.GET.get("cmd", "")

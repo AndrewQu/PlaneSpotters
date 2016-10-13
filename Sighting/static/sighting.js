@@ -27,7 +27,7 @@ function postJSON(url, data_obj, success_handler, args) {
       url: url,
       type: 'POST',
       data: JSON.stringify(data_obj),
-//      contentType: 'application/json; charset=utf-8',
+      contentType: 'application/json; charset=utf-8',
       dataType: 'json',
       async: true,
       success: success_handler
@@ -145,6 +145,62 @@ function submitSighting() {
    locLongV = parseFloat($('#locLong').val());
    setFieldValid(locLongV === locLongV, '#valid_locLong');
 
-   if (!all_fields_valid) alert("There are invalid input fields. Please check!");
+   if (!all_fields_valid) {
+      alert("There are invalid input fields. Please check!");
+      return;
+   }
 
+   // Construct the Json object to be sent to the server
+   spotterV = {
+      name: spotterNameV,
+      email: spotterEmailV
+   }
+   locationV = {
+      name: locNameV,
+      lat: locLatV,
+      long: locLongV
+   }
+   acEngine = {
+      type: engType.options[engType.selectedIndex].value,
+      number: engNumber.options[engNumber.selectedIndex].value,
+      positions: engPos.options[engPos.selectedIndex].value,
+      noise_desc: $('#engNoise').val(),
+      noise_audio: $('#audioPath').html()
+   }
+   acWing = {
+      number: wingNumber.options[wingNumber.selectedIndex].value,
+      position: wingLoc.options[wingLoc.selectedIndex].value,
+      swept: $('#wingSwept').val()
+   }
+   acSize = {  
+      length: plength.options[plength.selectedIndex].value,
+      wingspan: wingSpan.options[wingSpan.selectedIndex].value,
+      tail: tailHeight.options[tailHeight.selectedIndex].value
+   }
+
+   aircraftV = {
+      type: planeType.options[planeType.selectedIndex].value,
+      engine: acEngine,
+      size: acSize,
+      wing: acWing
+   }
+
+   sighting = {
+      cmd: "save_sighting",
+      spotter: spotterV,
+      location: locationV,
+      date: $('#dos').val(),
+      time: $('#tos').val(),
+      nvp: numVapours.options[numVapours.selectedIndex].value,
+      aircraft: aircraftV,
+      markings: $('#markDesc').val(),
+      photos: $('#imgPath').html()
+   };
+
+   postJSON(servicePage, sighting, function (json) {
+      if (json.err) alert(json.err);
+      else {
+         alert("json.ok=" + json.ok);
+      }
+   });
 }

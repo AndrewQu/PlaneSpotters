@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 
 import os
 import json
+import sys
 
 from Sighting.models import Sighting
 from Sighting.models import Aircraft
@@ -62,6 +63,7 @@ def uploadfile(request) :
 def service(request) :
    jdata = json.loads(request.body)
    cmd = jdata['cmd'] ## request.GET.get("cmd", "")
+#   sys.stdout.write("*** cmd=" + cmd + "\n")
    sid = 0
    if cmd == 'get_spotter' :
       sid = int(jdata["id"])
@@ -76,5 +78,20 @@ def service(request) :
          return JsonResponse({'name': locations[0].name, 'lat': locations[0].latitude,
                              'long': locations[0].longitude })
       else : return JsonResponse({'err': 'Invalid spotter id: ' + str(sid) })
+   elif cmd == 'save_sighting' :
+      spotter_v = jdata['spotter'] # name, email
+      location_v = jdata['location'] # name, lat(f), long(f)
+      aircraft = jdata['aircraft'] # type, engine{} size{} wing{}
+      acEngine = aircraft['engine'] # type, number, positions, noise_desc, noise_audio
+      acSize = aircraft['size'] # length,wingspan,tail
+      acWing = aircraft['wing'] # number,position,swept
 
-   return JsonResponse({'err':'sid=' + str(sid) + "  cmd=" + cmd })
+      photos = jdata['photos']
+      date_v = jdata['date']
+      time_v = jdata['time']
+      markings = jdata['markings']
+      nvp = jdata['nvp']
+      return JsonResponse({'ok': 'wing ' + acWing['number']})
+
+   return JsonResponse({'err':'Error: sid=' + str(sid) + "  cmd=" + cmd })
+

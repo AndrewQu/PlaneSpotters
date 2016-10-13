@@ -8,7 +8,33 @@ function sightingPageLoaded() {
    $('#tos').val(tstr);
    $('#wingSwept').val("10");
 
+   csrf_token = $("input:hidden[name=csrfmiddlewaretoken]").val();
+   $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+         }
+      }
+   });
 }
+function csrfSafeMethod(method) {
+   // these HTTP methods do not require CSRF protection
+   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+function postJSON(url, data_obj, success_handler, args) {
+   args = $.extend({
+      url: url,
+      type: 'POST',
+      data: JSON.stringify(data_obj),
+//      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      async: true,
+      success: success_handler
+   }, args);
+   return $.ajax(args);
+};
+
 
 function spotterIdChanged() {
    spotterId_val = spotterId.options[spotterId.selectedIndex].value;
@@ -18,10 +44,11 @@ function spotterIdChanged() {
       $('#spotterEmail').val("");
    }
    else {
-      $.getJSON(servicePage, { cmd: "get_spotter",
+      cmd_obj = { cmd: "get_spotter",
          nocache: new Date().getTime(),
          id: spotterId_val
-      }, function (json) {
+      };
+      postJSON(servicePage, cmd_obj, function (json) {
          if (json.err) alert(json.err);
          else {
             $('#spotterName').val(json.name);
@@ -40,10 +67,11 @@ function locationIdChanged() {
       $('#locLong').val("");
    }
    else {
-      $.getJSON(servicePage, { cmd: "get_loc",
+      cmd_obj = { cmd: "get_loc",
          nocache: new Date().getTime(),
          id: locId_val
-      }, function (json) {
+      };
+      postJSON(servicePage, cmd_obj, function (json) {
          if (json.err) alert(json.err);
          else {
             $('#locName').val(json.name);

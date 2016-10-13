@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
 import os
+import json
 
 from Sighting.models import Sighting
 from Sighting.models import Aircraft
@@ -59,16 +60,17 @@ def uploadfile(request) :
        return JsonResponse({'path': fpath})
 
 def service(request) :
-   cmd = request.GET.get("cmd", "")
+   jdata = json.loads(request.body)
+   cmd = jdata['cmd'] ## request.GET.get("cmd", "")
    sid = 0
    if cmd == 'get_spotter' :
-      sid = int(request.GET.get("id",""))
+      sid = int(jdata["id"])
       spotters = Spotter.objects.filter(spotter_id=sid)
       if len(spotters) > 0 :
          return JsonResponse({'name': spotters[0].name, 'email': spotters[0].email })
       else : return JsonResponse({'err': 'Invalid spotter id: ' + str(sid) })
    elif cmd == 'get_loc' :
-      sid = int(request.GET.get("id",""))
+      sid = int(jdata["id"])
       locations = Location.objects.filter(location_id=sid)
       if len(locations) > 0 :
          return JsonResponse({'name': locations[0].name, 'lat': locations[0].latitude,

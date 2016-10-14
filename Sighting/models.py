@@ -19,8 +19,8 @@ class Sighting(models.Model) :
    markings = models.CharField(max_length=4096) # description of any markings on plane
    photos = models.CharField(max_length=4096) # img1;img2;...
 
-   def NumberOfVapourTrails() :
-      return nvp
+   def __unicode__(self):
+      return str(self.spotter) + " " + str(self.time) + " " + str(self.location)
 
 def GetTypeChoice(type_type) :
    fpath = os.path.join(APP_ROOT, "static", type_type + ".cat")
@@ -43,6 +43,10 @@ class Aircraft(models.Model) :
    size = models.ForeignKey('Size', on_delete=models.PROTECT)
    wing = models.ForeignKey('Wing', on_delete=models.PROTECT)
 
+   def __unicode__(self):
+      return self.type + " " + str(self.wing) + " " + str(self.size)
+
+
 class Engine(models.Model) :
    ENGINE_POSITION = (
       ('12', 'left-right'),
@@ -59,6 +63,9 @@ class Engine(models.Model) :
    positions = models.CharField(max_length=60, choices=ENGINE_POSITION)
    noise_desc = models.CharField(max_length=500, blank=True)
    noise_audio = models.CharField(max_length=1024) # wav1;wav2,...
+
+   def __unicode__(self):
+      return self.type + "x" + str(self.number) + " " + self.positions
 
 class Size(models.Model) :
    LENGTH_CHOICE = (

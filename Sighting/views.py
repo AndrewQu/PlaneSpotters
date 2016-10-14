@@ -62,8 +62,7 @@ def uploadfile(request) :
 
 def service(request) :
    jdata = json.loads(request.body)
-   cmd = jdata['cmd'] ## request.GET.get("cmd", "")
-#   sys.stdout.write("*** cmd=" + cmd + "\n")
+   cmd = jdata['cmd']
    sid = 0
    if cmd == 'get_spotter' :
       sid = int(jdata["id"])
@@ -79,19 +78,58 @@ def service(request) :
                              'long': locations[0].longitude })
       else : return JsonResponse({'err': 'Invalid spotter id: ' + str(sid) })
    elif cmd == 'save_sighting' :
+      sighting = Sighting()
       spotter_v = jdata['spotter'] # name, email
+      spotter = Spotter.objects.filter(name=spotter_v['name']).first()
+      if spotter == None :
+         spotter = Spotter(name=spotter_v['name'], email=spotter_v['email'])
+         spotter.save()
+      sighting.spotter = spotter
+
       location_v = jdata['location'] # name, lat(f), long(f)
-      aircraft = jdata['aircraft'] # type, engine{} size{} wing{}
-      acEngine = aircraft['engine'] # type, number, positions, noise_desc, noise_audio
-      acSize = aircraft['size'] # length,wingspan,tail
-      acWing = aircraft['wing'] # number,position,swept
+      loc = Location.objects.filter(name=location_v['name']).first()
+      if loc == None :
+         loc = Location(name=location_v['name'], latitude=location_v['lat'], longitude=location_v['long'])
+         loc.save()
+      sighting.location = loc
 
-      photos = jdata['photos']
-      date_v = jdata['date']
-      time_v = jdata['time']
-      markings = jdata['markings']
-      nvp = jdata['nvp']
-      return JsonResponse({'ok': 'wing ' + acWing['number']})
+      ddmmyy = jdata['date'].split('/') # dd/mm/yyyy
+      hhmm = jdata['time'].split(':')  # hh:mm
+      sighting.time = datetime(int(ddmmyy[2]), int(ddmmyy[1]), int(ddmmyy[0]), int(hhmm[0]), int(hhmm[1]))
+      sighting.nvp = int(jdata['nvp'])
 
-   return JsonResponse({'err':'Error: sid=' + str(sid) + "  cmd=" + cmd })
+      acrft = jdata['aircraft'] # type, engine{} size{} wing{}
+      acEngine = acrft['engine'] # type, number, positions, noise_desc, noise_audio
+      acSize = acrft['size'] # length,wingspan,tail
+      acWing = acrft['wing'] # number,position,swept
+
+      kvargs = {'type': acEngine['type'], 'number': acEngine['number'], 'positions': acEngine['positions'],
+                'noise_desc': acEngine['noise_desc'], 'noise_audio':acEngine['noise_audio']}
+      engine = Engine.objects.filter(**kvargs).first()
+      if engine == None :
+         engine = Engine(**kvargs)
+         engine.save()
+
+      kvargs = {'length':acSize['length'], 'wingspan':acSize['wingspan'], 'tailheight':acSize['tail']}
+      size = Size.objects.filter(**kvargs).first()
+      if size == None :
+        size = Size(**kvargs)
+        size.save()
+
+      kvargs = {'number':acWing['number'], 'position':acWing['position'], 'swept':acWing['swept']}
+      wing = Wing.objects.filter(**kvargs).first()
+      if wing == None :
+         wing = Wing(**kvargs)
+         wing.save()
+
+      aircraft = Aircraft(type=acrft['type'], engine=engine, size=size, wing=wing)
+      aircraft.save()
+
+      sighting.aircraft = aircraft
+      sighting.markings = jdata['markings']
+      sighting.photos = jdata['photos']
+      sighting.save()
+      return JsonResponse({'ok': 'sighting.id=' + str(sighting.id)})
+
+   return JsonResponse({'err': 'Error in processing command:' + cmd })
 

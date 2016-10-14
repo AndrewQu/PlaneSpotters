@@ -126,6 +126,21 @@ function setFieldValid(valid, hash_id) {
    }
 }
 
+// check to see if array of strings are all integers
+function validate_ints(strInts, separator, hash_id, num_ints) {
+   ok = true;
+   ints = strInts.split(separator);
+   try {
+      for (var i = 0; i < num_ints; i++) {
+         if (isNaN(ints[i])) ok = false;
+         ii = parseInt(ints[i]);
+      }
+   } catch (err) {
+      ok = false;
+   }
+   setFieldValid(ok, hash_id)
+}
+
 function submitSighting() {
    // Validate fields
 
@@ -144,6 +159,9 @@ function submitSighting() {
 
    locLongV = parseFloat($('#locLong').val());
    setFieldValid(locLongV === locLongV, '#valid_locLong');
+
+   validate_ints($('#dos').val(), '/', '#valid_dos', 3);
+   validate_ints($('#tos').val(), ':', '#valid_tos', 2);
 
    if (!all_fields_valid) {
       alert("There are invalid input fields. Please check!");

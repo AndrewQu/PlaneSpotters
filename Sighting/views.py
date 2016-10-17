@@ -35,14 +35,6 @@ def add(request) :
              }
    return render(request, 'add.html', context)
 
-def save_sighting(request) :
-   errmsg = "No information given to plane sighting - cannot save!"
-   template = loader.get_template('adderr.html')
-   context = RequestContext(request, {
-        'errmsg': errmsg,
-    })
-   return HttpResponse(template.render(context))
-
 def uploadfile(request) :
     # request to display the upload file page
     if request.method != 'POST' :
@@ -129,7 +121,7 @@ def service(request) :
       sighting.markings = jdata['markings']
       sighting.photos = jdata['photos']
       sighting.save()
-      return JsonResponse({'ok': 'sighting.id=' + str(sighting.id)})
+      return JsonResponse({'ok': 'Your sighting saved successfully (id=' + str(sighting.id) + ')'})
 
    return JsonResponse({'err': 'Error in processing command:' + cmd })
 

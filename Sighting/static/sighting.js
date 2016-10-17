@@ -217,8 +217,9 @@ function submitSighting() {
 
    postJSON(servicePage, sighting, function (json) {
       if (json.err) alert(json.err);
+      else if (json.ok) alert(json.ok);
       else {
-         alert("json.ok=" + json.ok);
+         alert("Invalid obj:" + json);
       }
    });
 }

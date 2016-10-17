@@ -10,6 +10,7 @@ from django.core.files.storage import FileSystemStorage
 import os
 import json
 import sys
+import os.path
 
 from Sighting.models import Sighting
 from Sighting.models import Aircraft
@@ -19,6 +20,8 @@ from Sighting.models import Wing
 from Sighting.models import Spotter
 from Sighting.models import Location
 from Sighting.models import GetTypeChoice
+
+APP_ROOT = os.path.abspath(os.path.dirname(__file__))
  
 def index(request) :
    return HttpResponse("Welcome to Plane Spotters Home: " + request.path + " !")
@@ -51,6 +54,67 @@ def uploadfile(request) :
        fs = FileSystemStorage()
        filename = fs.save(fpath, files[0])
        return JsonResponse({'path': fpath})
+
+def writeDitaProperties(fdita, properties, indent) :
+   fdita.write(indent + '   <properties>\n')
+   for pname in properties.keys() :
+      fdita.write(indent + '      <property>\n')
+      fdita.write(indent + '      <proptype>' + pname + '</proptype>\n')
+      fdita.write(indent + '      <propvalue>' + str(properties[pname]) + '</propvalue>\n')
+      fdita.write(indent + '      </property>\n')
+
+   fdita.write(indent + '   </properties>\n')
+
+def saveSightingToDitaFile(sighting) :
+   fpath = os.path.join(APP_ROOT, "dita", "sighting_" + str(sighting.id) + ".xml")
+   fdita = open(fpath, 'w')
+   fdita.write('<?xml version="1.0" encoding="utf-8"?>\n')
+##   fdita.write('<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "reference.dtd">\n')
+
+   fdita.write('<reference id="sighting_' + str(sighting.id) + '">\n')
+   fdita.write('<title>Plane sighting #' + str(sighting.id) + '</title>\n')
+   fdita.write('<refbody>\n')
+   fdita.write('   <section>\n')
+   fdita.write('      <title>Spotter details</title>\n')
+   writeDitaProperties(fdita,
+        {'Name': sighting.spotter.name, 'Email': sighting.spotter.email}, '      ')
+   fdita.write('   </section>\n</refbody>\n</reference>\n')
+   fdita.close()
+
+#   <?xml version="1.0" encoding="utf-8"?>
+#<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+# "C:/UTIL/dita-ot-2.3.2/plugins/org.dita.specialization.dita11/dtd/task.dtd">
+#
+#<task id="washcar" xml:lang="en-us">
+#   <title>Washing the car</title>
+#   <!-- shortdesc>Keep your car looking great by washing it regularly.</shortdesc -->
+#   <taskbody>
+#      <context>
+#         <p>Keep your car looking great by washing it regularly.</p>
+#         <simpletable>
+#            <sthead><stentry>Column1</stentry>
+#            <stentry>Column2</stentry></sthead>
+#            <strow><stentry>Field1</stentry>
+#            <stentry>Field2</stentry></strow>
+#         </simpletable>
+#      </context>
+#      <!--<context><p></p></context>-->
+#      <steps>
+#         <step>
+#            <cmd>
+#               Rinse the car by spraying clean water
+#               from the hose.
+#            </cmd>
+#         </step>
+#         <step>
+#            <cmd>Dry the car using a dampened chamois.</cmd>
+#         </step>
+#      </steps>
+#      <result>
+#         <p>Very good results.</p>
+#      </result>
+#   </taskbody>
+#</task>
 
 def service(request) :
    jdata = json.loads(request.body)
@@ -121,6 +185,10 @@ def service(request) :
       sighting.markings = jdata['markings']
       sighting.photos = jdata['photos']
       sighting.save()
+
+      for s in Sighting.objects.all() :
+         saveSightingToDitaFile(s)
+
       return JsonResponse({'ok': 'Your sighting saved successfully (id=' + str(sighting.id) + ')'})
 
    return JsonResponse({'err': 'Error in processing command:' + cmd })

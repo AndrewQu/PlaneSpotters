@@ -15,3 +15,4 @@ Development notes:
 13. python manage.py createsuperuser --- root/PlaneSpotters
 14. visit localhost:8000/admin/
 15. Edit Sighting/admin.py and admin.site.register(Sighting),...
+16. Add dita processing
